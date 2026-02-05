@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const path = require('path');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -147,8 +148,15 @@ async function processFileForOpenAI(file) {
 
 const app = express();
 
-// Security headers
-app.use(helmet());
+// Security headers (allow inline styles for the example page)
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      'style-src': ["'self'", "'unsafe-inline'"],
+    },
+  },
+}));
 
 // CORS — allow all origins (API is protected by rate limiting, input
 // validation, and server-side API key; Wix HTML embeds run on
@@ -174,6 +182,21 @@ const chatLimiter = rateLimit({
 // Health check
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'bridgewater-chatbot' });
+});
+
+// Serve frontend static files (chatbot.js, example.html)
+app.use('/frontend', express.static(path.join(__dirname, 'frontend'), {
+  setHeaders(res, filePath) {
+    // Allow chatbot.js to be loaded cross-origin from Wix
+    if (filePath.endsWith('.js')) {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+  },
+}));
+
+// Serve example.html at root for easy browser testing
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend', 'example.html'));
 });
 
 // Chat endpoint
