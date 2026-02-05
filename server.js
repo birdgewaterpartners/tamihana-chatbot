@@ -11,10 +11,6 @@ const OpenAI = require('openai');
 // ---------------------------------------------------------------------------
 
 const PORT = process.env.PORT || 3001;
-const ALLOWED_ORIGINS = [
-  'https://bridgewaterpartners.co.nz',
-  'https://www.bridgewaterpartners.co.nz',
-];
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const MAX_MESSAGE_LENGTH = 1000;
 
@@ -51,18 +47,10 @@ const app = express();
 // Security headers
 app.use(helmet());
 
-// CORS — restrict to allowed origins
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['POST', 'GET', 'OPTIONS'],
-  allowedHeaders: ['Content-Type'],
-}));
+// CORS — allow all origins (API is protected by rate limiting, input
+// validation, and server-side API key; Wix HTML embeds run on
+// wixstatic.com so we cannot predict the exact origin)
+app.use(cors());
 
 // Body parsing
 app.use(express.json({ limit: '16kb' }));
@@ -157,5 +145,5 @@ app.use((err, _req, res, _next) => {
 
 app.listen(PORT, () => {
   console.log(`Chatbot server running on port ${PORT}`);
-  console.log(`CORS allowed origins: ${ALLOWED_ORIGINS.join(', ')}`);
+  console.log('CORS: all origins allowed');
 });
