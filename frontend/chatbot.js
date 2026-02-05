@@ -14,7 +14,7 @@
 
   // ── Configuration ────────────────────────────────────────────────────
   // Replace with your production backend URL (e.g. https://your-app.railway.app)
-  var API_URL = 'https://YOUR-BACKEND-URL.example.com/api/chat';
+  var API_URL = 'https://tamihana-chatbot-production-aeac.up.railway.app/api/chat';
   var MAX_LENGTH = 1000;
 
   // ── DOM references ───────────────────────────────────────────────────

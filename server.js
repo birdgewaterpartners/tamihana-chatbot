@@ -157,5 +157,5 @@ app.use((err, _req, res, _next) => {
 
 app.listen(PORT, () => {
   console.log(`Chatbot server running on port ${PORT}`);
-  console.log(`CORS allowed origin: ${ALLOWED_ORIGIN}`);
+  console.log(`CORS allowed origins: ${ALLOWED_ORIGINS.join(', ')}`);
 });
