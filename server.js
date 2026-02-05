@@ -11,7 +11,10 @@ const OpenAI = require('openai');
 // ---------------------------------------------------------------------------
 
 const PORT = process.env.PORT || 3001;
-const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://bridgewaterpartners.co.nz';
+const ALLOWED_ORIGINS = [
+  'https://bridgewaterpartners.co.nz',
+  'https://www.bridgewaterpartners.co.nz',
+];
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const MAX_MESSAGE_LENGTH = 1000;
 
@@ -48,9 +51,15 @@ const app = express();
 // Security headers
 app.use(helmet());
 
-// CORS — restrict to the allowed origin
+// CORS — restrict to allowed origins
 app.use(cors({
-  origin: ALLOWED_ORIGIN,
+  origin: function (origin, callback) {
+    if (!origin || ALLOWED_ORIGINS.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['POST', 'GET', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
 }));
