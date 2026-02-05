@@ -148,14 +148,16 @@ async function processFileForOpenAI(file) {
 
 const app = express();
 
-// Security headers (allow inline styles for the example page)
+// Security headers (relaxed for Wix cross-origin embed compatibility)
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       ...helmet.contentSecurityPolicy.getDefaultDirectives(),
       'style-src': ["'self'", "'unsafe-inline'"],
+      'script-src': ["'self'", "'unsafe-inline'"],
     },
   },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
 // CORS — allow all origins (API is protected by rate limiting, input
